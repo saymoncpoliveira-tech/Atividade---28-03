@@ -206,8 +206,19 @@ GROUP BY p.tipo;
 
 -- 7.  Quais produtos estão com estoque abaixo do "Estoque Mínimo" definido, exibindo o nome do fornecedor principal de cada um desses produtos para agilizar a cotação.
 
-SELECT p.tipo, e.qt_atual, e.estoque_minimo, f.nome_fornecedor
+-- Adicionando o que falta para a regra de negócio
+ALTER TABLE tb_estoque ADD COLUMN estoque_minimo INT NOT NULL DEFAULT 10;
+ALTER TABLE tb_produto ADD COLUMN fornecedor_principal VARCHAR(45);
+
+-- Atualizando um exemplo para teste
+UPDATE tb_produto SET fornecedor_principal = 'Metalúrgica Parafuso Ltda' WHERE id_produto = 598818;
+UPDATE tb_estoque SET estoque_minimo = 150 WHERE num_estoque = 1; -- Para o parafuso ficar "abaixo do mínimo"
+
+SELECT 
+    p.tipo AS Produto, 
+    e.qt_atual AS Estoque_Atual, 
+    e.estoque_minimo AS Minimo_Exigido,
+    p.fornecedor_principal AS Fornecedor
 FROM tb_produto p
-JOIN tb_estoque e ON p.tb_estoque_num_estoque = e.num_estoque
-JOIN tb_fornecedor f ON p.id_fornecedor = f.id_fornecedor
+INNER JOIN tb_estoque e ON p.tb_estoque_num_estoque = e.num_estoque
 WHERE e.qt_atual < e.estoque_minimo;
