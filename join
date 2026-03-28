@@ -73,13 +73,6 @@ CREATE TABLE tb_movimentacao (
     FOREIGN KEY (id_produto) REFERENCES tb_produto (id_produto)
 );
 
--- (DTL - CONTROLE DE TRANSAÇÃO)
-BEGIN;
-
--- ADIÇÃO DA COLUNA data_atualizacao NA TABELA PRODUTO (tb_produto)
-ALTER TABLE tb_produto
-ADD COLUMN data_atualizacao DATETIME;
-
 -- (DML - INSERT)
 -- ATENÇÃO: A ordem foi ajustada para respeitar as chaves estrangeiras!
 
@@ -109,45 +102,3 @@ VALUES (598818, 'Parafuso', 54.99, 1);
 INSERT INTO tb_movimentacao (status_mov, tipo_, data_hora, num_registro, id_produto)
 VALUES ('Em Andamento', 'transporte', '2026-09-30 14:30:00', 1, 598818);
 
--- DELETANDO DADOS NA TABELA ESTOQUE (tb_estoque)
-DELETE FROM tb_estoque WHERE num_estoque = 2;
-DELETE FROM tb_estoque WHERE num_estoque = 3;
-
--- (DML - UPDATE)
-
--- ATUALIZANDO SALÁRIO DO FUNCIONÁRIO QUANDO ELE É PROMOVIDO (o cara é bom d+)
--- Corrigido erro de sintaxe do OR
-UPDATE tb_funcionario
-SET salario = 5500.00
-WHERE funcao IN ('diretor', 'Diretor', 'DIRETOR');
-
--- ATUALIZANDO O PEDIDO QUANDO O CLIENTE CHATO MUDA A DATA, O HORÁRIO E O TIPO DO SERVIÇO (Mó vacilo).
-UPDATE tb_pedido
-SET datahora = '2026-10-27 18:30:00',
-    tipo = 'Serviço completo noturno'
-WHERE status_ped = 'Em Andamento - alterado para a noite';
-
-UPDATE tb_cliente
-SET nome = 'José Carlinhos'
-WHERE cpf = 18948956462;
-
--- Corrigido: Nome da coluna (tipo_), nome da coluna de data (data_hora) e aspas na data
-UPDATE tb_movimentacao
-SET tipo_ = 'Final de Ano'
-WHERE DATE(data_hora) = '2026-12-25';
-
-UPDATE tb_produto
-SET preco = 1500.00
-WHERE tipo = 'Show Particular';
-
--- Corrigido: Falta de ponto e vírgula no final
-UPDATE tb_estoque
-SET setor = 2
-WHERE qt_atual = 1500;
-
--- (DQL - DATA QUERY LANGUAGE)
--- Consultando os funcionários para verificar se o aumento foi aplicado
-SELECT nome, funcao, salario FROM tb_funcionario;
-
--- Fechando e validando a transação iniciada lá em cima
-COMMIT;
