@@ -85,8 +85,12 @@ INSERT INTO tb_funcionario (nome, funcao, salario, tmp_serviço)
 VALUES ('Roberto Carlos', 'Tecnico', 3500.00, 5);
 
 -- INSERINDO DADOS NA TABELA PEDIDO (tb_pedido)
+-- Inserindo PEDIDO usando subconsultas para achar o CPF do cliente e o Registro do funcionário pelo nome
 INSERT INTO tb_pedido (status_ped, tipo, datahora, idcliente, num_registro_ped) 
-VALUES ('Em Andamento', 'Serviço completo diurno', '2026-10-25 14:30:00', 123456789, 1);
+VALUES ('Em Andamento', 'Manutenção Preventiva', NOW(), 
+    (SELECT cpf FROM tb_cliente WHERE nome = 'Flavinho do Grau'), 
+    (SELECT num_registro FROM tb_funcionario WHERE nome = 'Roberto Carlos')
+);
 
 -- INSERINDO DADOS NA TABELA ESTOQUE (tb_estoque)
 INSERT INTO tb_estoque (num_estoque, descricao, setor, qt_atual) VALUES (1, 'Ferragens', 1, 100);
@@ -94,13 +98,18 @@ INSERT INTO tb_estoque (num_estoque, descricao, setor, qt_atual) VALUES (2, 'Equ
 INSERT INTO tb_estoque (num_estoque, descricao, setor, qt_atual) VALUES (3, 'Ferramentas de Corte', 1, 100);
 
 -- INSERINDO DADOS NA TABELA PRODUTO (tb_produto) - Precisa vir antes da movimentação!
-INSERT INTO tb_produto (tipo, preco, tb_estoque_num_estoque)
-VALUES ('Parafuso', 54.99, 1);
+-- Inserindo PRODUTO usando subconsulta para achar o número do estoque
+INSERT INTO tb_produto (tipo, preco, tb_estoque_num_estoque) 
+VALUES ('Parafuso Aço', 5.50, (SELECT num_estoque FROM tb_estoque WHERE descricao = 'Ferragens' LIMIT 1));
 
 -- INSERINDO DADOS NA TABELA MOVIMENTAÇÃO (tb_movimentacao)
 -- Corrigido: Dia 30 de setembro (setembro não tem 31) e referenciando o num_registro = 1 (Roberto Carlos)
+-- Inserindo MOVIMENTAÇÃO usando subconsultas para achar o Funcionário e o Produto
 INSERT INTO tb_movimentacao (status_mov, tipo_, data_hora, num_registro, id_produto)
-VALUES ('Em Andamento', 'transporte', '2026-09-30 14:30:00', 1, 1);
+VALUES ('Finalizado', 'Saída', NOW(), 
+    (SELECT num_registro FROM tb_funcionario WHERE nome = 'Roberto Carlos'),
+    (SELECT id_produto FROM tb_produto WHERE tipo = 'Parafuso Aço' LIMIT 1)
+);
 
 -- 1. MAIS CLIENTES
 INSERT INTO tb_cliente (cpf, nome, cep) VALUES 
@@ -176,6 +185,34 @@ INNER JOIN tb_pedido ped ON c.cpf = ped.idcliente
 INNER JOIN tb_movimentacao m ON ped.num_registro_ped = m.num_registro
 INNER JOIN tb_produto p ON m.id_produto = p.id_produto
 GROUP BY c.nome;
+
+-- THIAGO
+
+-- 3. Quais fornecedores estão com entregas pendentes associadas a ordens de serviço em aberto;
+-- (Com o adendo de que, na ausencia de uma tabela de fornecedores, houve uma adaptação usando como base a tabela de pedidos, solicitando o status do mesmo.)
+
+SELECT *
+FROM tb_pedido 
+WHERE status_ped IN (
+    -- Subconsulta: Isola apenas os status que representam pedidos "em aberto"
+    SELECT DISTINCT status_ped 
+    FROM tb_pedido 
+    WHERE status_ped NOT IN ('Concluído', 'Cancelado')
+);
+
+-- 4. Todos os produtos que nunca foram vendidos (ou que não tiveram saídas nos últimos 6 meses);
+
+-- Subconsulta listando produtos que nunca tiveram uma movimentação (Subconsulta com NOT IN)
+SELECT tipo 
+FROM tb_produto 
+WHERE id_produto NOT IN (
+    -- Subconsulta: Filtra produtos que TIVERAM saídas recentes (últimos 6 meses)
+    -- Se o produto não estiver nesta lista, ele ou nunca saiu ou está parado há muito tempo.
+    SELECT id_produto 
+    FROM tb_movimentacao 
+    WHERE tipo_ = 'Saída' 
+    AND data_hora >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+);
 
 -- SAYMON
 
