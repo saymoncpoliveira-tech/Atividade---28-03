@@ -100,7 +100,7 @@ VALUES ('Parafuso', 54.99, 1);
 -- INSERINDO DADOS NA TABELA MOVIMENTAÇÃO (tb_movimentacao)
 -- Corrigido: Dia 30 de setembro (setembro não tem 31) e referenciando o num_registro = 1 (Roberto Carlos)
 INSERT INTO tb_movimentacao (status_mov, tipo_, data_hora, num_registro, id_produto)
-VALUES ('Em Andamento', 'transporte', '2026-09-30 14:30:00', 1, 598818);
+VALUES ('Em Andamento', 'transporte', '2026-09-30 14:30:00', 1, 1);
 
 -- 1. MAIS CLIENTES
 INSERT INTO tb_cliente (cpf, nome, cep) VALUES 
@@ -139,7 +139,7 @@ INSERT INTO tb_pedido (status_ped, tipo, datahora, idcliente, num_registro_ped) 
 
 -- 6. MAIS MOVIMENTAÇÕES
 INSERT INTO tb_movimentacao (status_mov, tipo_, data_hora, num_registro, id_produto) VALUES 
-('Finalizado', 'Saída de Material', '2026-03-20 08:30:00', 2, 598819), -- Chave Inglesa
-('Pendente', 'Entrada de Estoque', '2026-03-25 10:15:00', 4, 598821), -- Óleo
-('Finalizado', 'Uso Interno', '2026-03-28 09:00:00', 1, 598820); -- Capacete
+('Finalizado', 'Saída de Material', '2026-03-20 08:30:00', 2, 2), -- Chave Inglesa
+('Pendente', 'Entrada de Estoque', '2026-03-25 10:15:00', 4, 4), -- Óleo
+('Finalizado', 'Uso Interno', '2026-03-28 09:00:00', 1, 3); -- Capacete
 
