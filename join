@@ -94,8 +94,8 @@ INSERT INTO tb_estoque (num_estoque, descricao, setor, qt_atual) VALUES (2, 'Equ
 INSERT INTO tb_estoque (num_estoque, descricao, setor, qt_atual) VALUES (3, 'Ferramentas de Corte', 1, 100);
 
 -- INSERINDO DADOS NA TABELA PRODUTO (tb_produto) - Precisa vir antes da movimentação!
-INSERT INTO tb_produto (id_produto, tipo, preco, tb_estoque_num_estoque)
-VALUES (598818, 'Parafuso', 54.99, 1);
+INSERT INTO tb_produto (tipo, preco, tb_estoque_num_estoque)
+VALUES ('Parafuso', 54.99, 1);
 
 -- INSERINDO DADOS NA TABELA MOVIMENTAÇÃO (tb_movimentacao)
 -- Corrigido: Dia 30 de setembro (setembro não tem 31) e referenciando o num_registro = 1 (Roberto Carlos)
